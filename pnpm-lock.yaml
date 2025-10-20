@@ -26,6 +26,9 @@ importers:
       hono:
         specifier: ^4.10.1
         version: 4.10.1
+      ms:
+        specifier: ^2.1.3
+        version: 2.1.3
       svelte-icons-pack:
         specifier: ^3.1.3
         version: 3.1.3(svelte@5.41.0)
@@ -51,6 +54,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.1.14
         version: 4.1.14(vite@7.1.11(@types/node@22.18.11)(jiti@2.6.1)(lightningcss@1.30.1))
+      '@types/ms':
+        specifier: ^2.1.0
+        version: 2.1.0
       '@upstash/redis':
         specifier: ^1.35.6
         version: 1.35.6
@@ -761,6 +767,9 @@ packages:
 
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
+
+  '@types/ms@2.1.0':
+    resolution: {integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==}
 
   '@types/node@22.18.11':
     resolution: {integrity: sha512-Gd33J2XIrXurb+eT2ktze3rJAfAp9ZNjlBdh4SVgyrKEOADwCbdUDaK7QgJno8Ue4kcajscsKqu6n8OBG3hhCQ==}
@@ -2101,6 +2110,8 @@ snapshots:
   '@types/cookie@0.6.0': {}
 
   '@types/estree@1.0.8': {}
+
+  '@types/ms@2.1.0': {}
 
   '@types/node@22.18.11':
     dependencies:
