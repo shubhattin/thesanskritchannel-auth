@@ -42,3 +42,7 @@ export async function getKeysWithPattern(pattern: string): Promise<string[]> {
   const keys = (await redis.eval(script, [], [pattern])) as string[];
   return keys;
 }
+
+export const REDIS_CACHE_KEYS = {
+  user_app_scope: (user_id: string, scope: string) => `user_app_scope:${user_id}:${scope}`
+};
