@@ -10,9 +10,7 @@ import { zValidator } from '@hono/zod-validator';
 import ms from 'ms';
 
 const router = new Hono()
-  .use(protectedAdminRoute)
-  // all routes are protectedAdminRoute
-  .get('/get_user_app_scope_list', async (c) => {
+  .get('/get_user_app_scope_list', protectedAdminRoute, async (c) => {
     const user = c.get('user')!;
     const app_scopes = await db.query.user_app_scope_join.findMany({
       where: (tbl, { eq }) => eq(tbl.user_id, user.id)
@@ -21,9 +19,10 @@ const router = new Hono()
   })
   .get(
     '/get_user_app_scope_status',
-    zValidator('json', z.object({ scope_name: AppScopeEnum, user_id: z.string() })),
+    //  public route
+    zValidator('query', z.object({ scope_name: AppScopeEnum, user_id: z.string() })),
     async (c) => {
-      const { scope_name, user_id } = c.req.valid('json');
+      const { scope_name, user_id } = c.req.valid('query');
       const cache = await redis.get<boolean>(REDIS_CACHE_KEYS.user_app_scope(user_id, scope_name));
       if (cache !== null && cache !== undefined) return c.json(Boolean(cache));
 
@@ -40,6 +39,7 @@ const router = new Hono()
   )
   .post(
     '/add_user_app_scope',
+    protectedAdminRoute,
     zValidator('json', z.object({ scope: AppScopeEnum, user_id: z.string() })),
     async (c) => {
       const { scope, user_id } = c.req.valid('json');
@@ -54,9 +54,10 @@ const router = new Hono()
   )
   .delete(
     '/remove_user_app_scope',
-    zValidator('json', z.object({ scope: AppScopeEnum, user_id: z.string() })),
+    protectedAdminRoute,
+    zValidator('query', z.object({ scope: AppScopeEnum, user_id: z.string() })),
     async (c) => {
-      const { scope, user_id } = c.req.valid('json');
+      const { scope, user_id } = c.req.valid('query');
       await Promise.all([
         db
           .delete(user_app_scope_join)

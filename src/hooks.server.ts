@@ -5,10 +5,13 @@ import { building } from '$app/environment';
 
 export const handle: Handle = async ({ event, resolve }) => {
   const origin = event.request.headers.get('origin');
-  const isAllowedOrigin = !!origin && ALLOWED_ORIGINS.includes(origin);
+  const isAllowedOrigin =
+    !!origin &&
+    (import.meta.env.PROD
+      ? ALLOWED_ORIGINS.includes(origin)
+      : /^http:\/\/localhost:.+$/.test(origin));
 
-  const CORS_ALLOWED_URLS = ['/api/auth', '/api/ext'];
-  const IS_CORS_ALLOWED_URL = CORS_ALLOWED_URLS.some((url) => event.url.pathname.startsWith(url));
+  const IS_CORS_ALLOWED_URL = /^\/api\/.+$/.test(event.url.pathname);
   // Required for CORS to work
   if (IS_CORS_ALLOWED_URL && event.request.method === 'OPTIONS' && isAllowedOrigin) {
     return new Response(null, {

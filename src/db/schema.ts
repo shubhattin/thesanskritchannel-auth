@@ -31,3 +31,7 @@ export const userRelation = relations(user, ({ one, many }) => ({
 export const accountRelation = relations(account, ({ one }) => ({
   user: one(user, { fields: [account.userId], references: [user.id] })
 }));
+
+export const userAppScopeJoinRelation = relations(user_app_scope_join, ({ one }) => ({
+  user: one(user, { fields: [user_app_scope_join.user_id], references: [user.id] })
+}));
