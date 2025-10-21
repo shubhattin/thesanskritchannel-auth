@@ -7,3 +7,7 @@ bun.lockb
 
 # Miscellaneous
 /static/
+
+src/db/migrations
+src/db/scripts/out/
+src/db/scripts/backup/
