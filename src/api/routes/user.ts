@@ -3,10 +3,6 @@ import { protectedAdminRoute } from '../context';
 import { db } from '~/db/db';
 import { zValidator } from '@hono/zod-validator';
 import z from 'zod';
-import { auth } from '~/lib/auth';
-import { redis } from '~/db/redis';
-import { user } from '~/db/auth-schema';
-import { eq } from 'drizzle-orm';
 
 const router = new Hono()
   .use(protectedAdminRoute)
@@ -31,25 +27,26 @@ const router = new Hono()
       }
     });
     return c.json(users);
-  })
-  .delete('/remove_user', zValidator('query', z.object({ user_id: z.string() })), async (c) => {
-    const cookie = c.header('Cookie');
-    const { user_id } = c.req.valid('query');
-    const { sessions } = await auth.api.listUserSessions({
-      body: {
-        userId: user_id
-      },
-      headers: {
-        Cookie: cookie!
-      }
-    });
-    await Promise.allSettled([db.delete(user).where(eq(user.id, user_id))]);
-    await Promise.allSettled([
-      ...sessions.map(async (session, i) => {
-        await redis.del(session.token);
-      })
-    ]);
-    return c.json({ success: true });
   });
 
 export const user_router = router;
+
+// .post('/remove_user', zValidator('json', z.object({ user_id: z.string() })), async (c) => {
+//   const cookie = c.header('Cookie');
+//   const { user_id } = c.req.valid('json');
+//   const { sessions } = await auth.api.listUserSessions({
+//     body: {
+//       userId: user_id
+//     },
+//     headers: {
+//       Cookie: cookie!
+//     }
+//   });
+//   await Promise.allSettled([db.delete(user).where(eq(user.id, user_id))]);
+//   await Promise.allSettled([
+//     ...sessions.map(async (session, i) => {
+//       await redis.del(session.token);
+//     })
+//   ]);
+//   return c.json({ success: true });
+// });

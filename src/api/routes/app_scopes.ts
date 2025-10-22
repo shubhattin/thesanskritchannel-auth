@@ -5,7 +5,7 @@ import { and, eq } from 'drizzle-orm';
 import { redis } from '~/db/redis';
 import { REDIS_CACHE_KEYS } from '~/db/redis';
 import { Hono } from 'hono';
-import { protectedAdminRoute } from '../context';
+import { protectedAdminRoute, protectedRoute } from '../context';
 import { zValidator } from '@hono/zod-validator';
 import ms from 'ms';
 
@@ -39,7 +39,7 @@ const router = new Hono()
   )
   .post(
     '/add_user_app_scope',
-    protectedAdminRoute,
+    protectedRoute,
     zValidator('json', z.object({ scope: AppScopeEnum, user_id: z.string() })),
     async (c) => {
       const { scope, user_id } = c.req.valid('json');
@@ -52,12 +52,12 @@ const router = new Hono()
       return c.json({ success: true });
     }
   )
-  .delete(
+  .post(
     '/remove_user_app_scope',
     protectedAdminRoute,
-    zValidator('query', z.object({ scope: AppScopeEnum, user_id: z.string() })),
+    zValidator('json', z.object({ scope: AppScopeEnum, user_id: z.string() })),
     async (c) => {
-      const { scope, user_id } = c.req.valid('query');
+      const { scope, user_id } = c.req.valid('json');
       await Promise.all([
         db
           .delete(user_app_scope_join)

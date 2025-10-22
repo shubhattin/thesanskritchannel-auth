@@ -10,7 +10,6 @@ export const handle: Handle = async ({ event, resolve }) => {
     (import.meta.env.PROD
       ? ALLOWED_ORIGINS.includes(origin)
       : /^http:\/\/localhost:.+$/.test(origin));
-
   const IS_CORS_ALLOWED_URL = /^\/api\/.+$/.test(event.url.pathname);
   // Required for CORS to work
   if (IS_CORS_ALLOWED_URL && event.request.method === 'OPTIONS' && isAllowedOrigin) {
@@ -18,7 +17,7 @@ export const handle: Handle = async ({ event, resolve }) => {
       headers: {
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
         'Access-Control-Allow-Headers':
-          'Content-Type, Authorization, X-Requested-With, X-Captcha-Response',
+          'Content-Type, Authorization, X-Requested-With, X-Captcha-Response' + ', X-Bhasha',
         'Access-Control-Allow-Credentials': 'true',
         'Access-Control-Allow-Origin': origin,
         Vary: 'Origin'
