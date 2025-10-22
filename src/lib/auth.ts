@@ -12,9 +12,7 @@ import { z } from 'zod';
 export const ALLOWED_ORIGINS = (() => {
   if (import.meta.env.DEV) return ['http://localhost:*'];
   const list: string[] = [];
-  if (env.AUTH_DOMAIN && env.AUTH_DOMAIN_SITES)
-    for (let site of env.AUTH_DOMAIN_SITES.split(','))
-      list.push(`https://${site}.${env.AUTH_DOMAIN}`);
+  if (env.AUTH_DOMAIN) list.push(`https://*.${env.AUTH_DOMAIN}`);
   const other_allowed_origins = z.url().array().safeParse(env.OTHER_ALLOWED_ORIGINS?.split(','));
   if (other_allowed_origins.success) list.push(...other_allowed_origins.data);
   return list;
