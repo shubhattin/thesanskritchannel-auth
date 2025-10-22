@@ -2,13 +2,16 @@ import type { Handle } from '@sveltejs/kit';
 import { auth, ALLOWED_ORIGINS } from '$lib/auth'; // path to your auth file
 import { svelteKitHandler } from 'better-auth/svelte-kit';
 import { building } from '$app/environment';
+import { env } from '$env/dynamic/private';
+
+export const AUTH_DOMAIN_REGEX = new RegExp(`^https:\/\/.*\.${env.AUTH_DOMAIN}$`);
 
 export const handle: Handle = async ({ event, resolve }) => {
   const origin = event.request.headers.get('origin');
   const isAllowedOrigin =
     !!origin &&
     (import.meta.env.PROD
-      ? ALLOWED_ORIGINS.includes(origin)
+      ? ALLOWED_ORIGINS.includes(origin) || (env.AUTH_DOMAIN && AUTH_DOMAIN_REGEX.test(origin))
       : /^http:\/\/localhost:.+$/.test(origin));
   const IS_CORS_ALLOWED_URL = /^\/api\/.+$/.test(event.url.pathname);
   // Required for CORS to work
