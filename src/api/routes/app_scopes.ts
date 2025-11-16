@@ -8,6 +8,9 @@ import { Hono } from 'hono';
 import { protectedAdminRoute, protectedRoute } from '../context';
 import { zValidator } from '@hono/zod-validator';
 import ms from 'ms';
+import { waitUntil } from '@vercel/functions';
+
+const CACHE_TIME_S = ms('25days') / 1000;
 
 const router = new Hono()
   .get('/get_user_app_scope_list', protectedAdminRoute, async (c) => {
@@ -29,10 +32,12 @@ const router = new Hono()
       const app_scope = await db.query.user_app_scope_join.findFirst({
         where: (tbl, { eq, and }) => and(eq(tbl.user_id, user_id), eq(tbl.scope, scope_name))
       });
-      // store cache
-      await redis.set(REDIS_CACHE_KEYS.user_app_scope(user_id, scope_name), !!app_scope, {
-        ex: ms('20days') / 1000
-      });
+      // store cache in background
+      waitUntil(
+        redis.set(REDIS_CACHE_KEYS.user_app_scope(user_id, scope_name), !!app_scope, {
+          ex: CACHE_TIME_S
+        })
+      );
 
       return c.json(!!app_scope);
     }
@@ -43,12 +48,13 @@ const router = new Hono()
     zValidator('json', z.object({ scope: AppScopeEnum, user_id: z.string() })),
     async (c) => {
       const { scope, user_id } = c.req.valid('json');
-      await Promise.allSettled([
-        db.insert(user_app_scope_join).values({ user_id, scope }),
+      await db.insert(user_app_scope_join).values({ user_id, scope });
+      // precache the result in background
+      waitUntil(
         redis.set(REDIS_CACHE_KEYS.user_app_scope(user_id, scope), true, {
-          ex: ms('20days') / 1000
+          ex: CACHE_TIME_S
         })
-      ]);
+      );
       return c.json({ success: true });
     }
   )
