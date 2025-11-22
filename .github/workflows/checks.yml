@@ -5,6 +5,7 @@ on:
 
 env:
   PUBLIC_BETTER_AUTH_URL: http://localhost:5188
+  PG_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
 
 jobs:
   type_build_check:
