@@ -19,6 +19,7 @@ export const ALLOWED_ORIGINS = (() => {
 })();
 
 export const auth = betterAuth({
+  secret: env.BETTER_AUTH_SECRET,
   database: drizzleAdapter(db, {
     provider: 'pg',
     schema: schema
