@@ -8,6 +8,7 @@ import { admin, openAPI, username } from 'better-auth/plugins';
 import { COOKIE_CACHE_TIME_MS } from './cache-time';
 import { userInfoPlugin } from './auth_plugins/user_info/server';
 import { z } from 'zod';
+import { PUBLIC_BETTER_AUTH_URL } from '$env/static/public';
 
 export const ALLOWED_ORIGINS = (() => {
   if (import.meta.env.DEV) return ['http://localhost:*'];
@@ -20,6 +21,7 @@ export const ALLOWED_ORIGINS = (() => {
 
 export const auth = betterAuth({
   secret: env.BETTER_AUTH_SECRET,
+  baseURL: PUBLIC_BETTER_AUTH_URL,
   database: drizzleAdapter(db, {
     provider: 'pg',
     schema: schema
