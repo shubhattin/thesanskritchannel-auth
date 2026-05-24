@@ -5,7 +5,7 @@ import z from 'zod';
 
 export * from './auth-schema';
 
-const APP_SCOPES = ['projects_portal', 'padavali'] as const;
+const APP_SCOPES = ['projects_portal', 'padavali', 'lekha'] as const;
 export const AppScopeEnum = z.enum(APP_SCOPES);
 export type app_scope_type = (typeof APP_SCOPES)[number];
 export const app_scope_enum_db = pgEnum('app_scope', APP_SCOPES);
