@@ -5,7 +5,7 @@ import { and, eq } from 'drizzle-orm';
 import { redis } from '~/db/redis';
 import { REDIS_CACHE_KEYS } from '~/db/redis';
 import { Hono } from 'hono';
-import { protectedAdminRoute, protectedRoute } from '../context';
+import { protectedAdminRoute } from '../context';
 import { zValidator } from '@hono/zod-validator';
 import ms from 'ms';
 import { waitUntil } from '@vercel/functions';
@@ -13,13 +13,22 @@ import { waitUntil } from '@vercel/functions';
 const CACHE_TIME_S = ms('25days') / 1000;
 
 const router = new Hono()
-  .get('/get_user_app_scope_list', protectedAdminRoute, async (c) => {
-    const user = c.get('user')!;
-    const app_scopes = await db.query.user_app_scope_join.findMany({
-      where: (tbl, { eq }) => eq(tbl.user_id, user.id)
-    });
-    return c.json(app_scopes.map((scope) => scope.scope));
-  })
+  .get(
+    '/get_user_app_scope_list',
+    // public
+    zValidator('query', z.object({ user_id: z.string() })),
+    async (c) => {
+      const user = c.get('user')!;
+      const { user_id } = c.req.valid('query');
+      if (user?.role !== 'admin' && user.id !== user_id) {
+        return c.json({ error: 'Unauthorized' }, 401);
+      }
+      const app_scopes = await db.query.user_app_scope_join.findMany({
+        where: (tbl, { eq }) => eq(tbl.user_id, user_id)
+      });
+      return c.json({ scopes: app_scopes.map((scope) => scope.scope) });
+    }
+  )
   .get(
     '/get_user_app_scope_status',
     //  public route
@@ -44,7 +53,7 @@ const router = new Hono()
   )
   .post(
     '/add_user_app_scope',
-    protectedRoute,
+    protectedAdminRoute,
     zValidator('json', z.object({ scope: AppScopeEnum, user_id: z.string() })),
     async (c) => {
       const { scope, user_id } = c.req.valid('json');
