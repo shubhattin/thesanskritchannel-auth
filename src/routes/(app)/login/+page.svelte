@@ -3,9 +3,13 @@
   import { signIn } from '$lib/auth-client';
   import { Icon } from 'svelte-icons-pack';
   import { GoogleIcon } from '~/lib/components/icons';
+  import { AiFillGithub } from 'svelte-icons-pack/ai';
 
   async function handleGoogleLogin() {
     await signIn.social({ provider: 'google', callbackURL: window.location.origin + '/' });
+  }
+  async function handleGithubLogin() {
+    await signIn.social({ provider: 'github', callbackURL: window.location.origin + '/' });
   }
 </script>
 
@@ -20,6 +24,10 @@
     <Button class="w-full gap-2" variant="outline" onclick={handleGoogleLogin}>
       <Icon src={GoogleIcon} className="size-5" />
       Continue with Google
+    </Button>
+    <Button class="w-full gap-2" variant="outline" onclick={handleGithubLogin}>
+      <Icon src={AiFillGithub} className="size-6" />
+      Continue with Github
     </Button>
   </div>
 </div>
