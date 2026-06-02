@@ -20,5 +20,6 @@ export const VerificationSchemaZod = createSelectSchema(verification, {
 });
 export const UserAppScopeJoinSchemaZod = createSelectSchema(user_app_scope_join);
 export const JwksSchemaZod = createSelectSchema(jwks, {
-  createdAt: z.coerce.date()
+  createdAt: z.coerce.date(),
+  expiresAt: z.coerce.date().optional().nullable()
 });

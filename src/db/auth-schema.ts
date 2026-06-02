@@ -1,4 +1,3 @@
-import { relations } from 'drizzle-orm';
 import { pgTable, text, timestamp, boolean, index } from 'drizzle-orm/pg-core';
 
 export const user = pgTable(
@@ -72,14 +71,3 @@ export const jwks = pgTable('jwks', {
   createdAt: timestamp('created_at').notNull(),
   expiresAt: timestamp('expires_at')
 });
-
-export const userRelations = relations(user, ({ many }) => ({
-  accounts: many(account)
-}));
-
-export const accountRelations = relations(account, ({ one }) => ({
-  user: one(user, {
-    fields: [account.userId],
-    references: [user.id]
-  })
-}));
