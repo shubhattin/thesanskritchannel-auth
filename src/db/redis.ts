@@ -44,5 +44,6 @@ export async function getKeysWithPattern(pattern: string): Promise<string[]> {
 }
 
 export const REDIS_CACHE_KEYS = {
-  user_app_scope: (user_id: string, scope: string) => `user_app_scope:${user_id}:${scope}`
+  user_app_scope: (user_id: string, scope: string) => `user_app_scope:${user_id}:${scope}`,
+  current_jwks_token: () => 'current_jwks'
 };

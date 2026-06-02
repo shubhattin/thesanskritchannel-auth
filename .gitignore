@@ -28,3 +28,5 @@ src/db/scripts/backup/
 
 **/a.ts
 **/a.js
+
+auth-schema.ts

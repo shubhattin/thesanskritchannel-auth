@@ -4,7 +4,7 @@ import { db } from '../db/db';
 import { redis } from '../db/redis';
 import * as schema from '../db/schema';
 import { env } from '$env/dynamic/private';
-import { admin, openAPI, username } from 'better-auth/plugins';
+import { admin, openAPI, username, jwt } from 'better-auth/plugins';
 import { COOKIE_CACHE_TIME_MS } from './cache-time';
 import { userInfoPlugin } from './auth_plugins/user_info/server';
 import { z } from 'zod';
@@ -38,8 +38,8 @@ export const auth = betterAuth({
     // to keep it simple its google auth only for now
     admin(),
     ...(import.meta.env.DEV ? [openAPI()] : []),
-    userInfoPlugin()
-    // jwt()
+    userInfoPlugin(),
+    jwt()
     // captcha({
     //   provider: 'cloudflare-turnstile',
     //   secretKey: env.TURNSTILE_SECRET_KEY!

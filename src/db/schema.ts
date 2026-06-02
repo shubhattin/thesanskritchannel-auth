@@ -23,15 +23,6 @@ export const user_app_scope_join = pgTable(
 
 // relations
 
-export const userRelation = relations(user, ({ one, many }) => ({
-  accounts: many(account),
-  app_scopes: many(user_app_scope_join)
-}));
-
-export const accountRelation = relations(account, ({ one }) => ({
-  user: one(user, { fields: [account.userId], references: [user.id] })
-}));
-
 export const userAppScopeJoinRelation = relations(user_app_scope_join, ({ one }) => ({
   user: one(user, { fields: [user_app_scope_join.user_id], references: [user.id] })
 }));
