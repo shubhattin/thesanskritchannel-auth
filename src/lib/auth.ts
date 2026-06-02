@@ -10,6 +10,9 @@ import { userInfoPlugin } from './auth_plugins/user_info/server';
 import { z } from 'zod';
 import { PUBLIC_BETTER_AUTH_URL } from '$env/static/public';
 
+const JWKS_ROTATION_INTERVAL_S = 60 * 60 * 24 * 30; // 30 days
+const JWKS_GRACE_PERIOD_S = 60 * 60 * 24 * 30; // 30 days
+
 export const ALLOWED_ORIGINS = (() => {
   if (import.meta.env.DEV) return ['http://localhost:*'];
   const list: string[] = [];
@@ -39,7 +42,12 @@ export const auth = betterAuth({
     admin(),
     ...(import.meta.env.DEV ? [openAPI()] : []),
     userInfoPlugin(),
-    jwt()
+    jwt({
+      jwks: {
+        rotationInterval: JWKS_ROTATION_INTERVAL_S,
+        gracePeriod: JWKS_GRACE_PERIOD_S
+      }
+    })
     // captcha({
     //   provider: 'cloudflare-turnstile',
     //   secretKey: env.TURNSTILE_SECRET_KEY!
