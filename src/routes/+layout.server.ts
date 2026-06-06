@@ -1,10 +1,5 @@
 import { auth } from '~/lib/auth';
 import type { LayoutServerLoad } from './$types'; // Adjust the path based on your project structure
-import type { Config } from '@sveltejs/adapter-vercel';
-
-export const config: Config = {
-  regions: ['sin1']
-};
 
 export const load: LayoutServerLoad = async ({ request }) => {
   const session = await auth.api.getSession({
