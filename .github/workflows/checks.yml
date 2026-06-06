@@ -6,6 +6,9 @@ on:
 env:
   PUBLIC_BETTER_AUTH_URL: http://localhost:5188
   PG_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+  BETTER_AUTH_SECRET: ci-build-placeholder
+  UPSTASH_REDIS_REST_URL: https://placeholder.upstash.io
+  UPSTASH_REDIS_REST_TOKEN: placeholder
 
 jobs:
   type_build_check:
