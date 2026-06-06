@@ -13,7 +13,7 @@
 
 <QueryClientProvider client={queryClient}>
   <ModeWatcher />
-  <div class="contaiiner mx-auto mb-1 max-w-screen-lg">
+  <div class="contaiiner mx-auto mb-1 max-w-5xl">
     <div class="mx-2">
       {@render children()}
     </div>
