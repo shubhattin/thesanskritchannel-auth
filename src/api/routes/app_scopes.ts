@@ -32,10 +32,7 @@ const router = new Hono()
   .get(
     '/get_user_app_scope_status',
     //  public route
-    tbValidator(
-      'query',
-      Type.Object({ scope_name: AppScopeEnum, user_id: Type.String() })
-    ),
+    tbValidator('query', Type.Object({ scope_name: AppScopeEnum, user_id: Type.String() })),
     async (c) => {
       const { scope_name, user_id } = c.req.valid('query');
       const cache = await redis.get<boolean>(REDIS_CACHE_KEYS.user_app_scope(user_id, scope_name));

@@ -6,7 +6,7 @@ import { userInfoPluginClient } from './auth_plugins/user_info/client';
 export const authClient = createAuthClient({
   baseURL:
     PUBLIC_BETTER_AUTH_URL ?? import.meta.env.VITE_BETTER_AUTH_URL ?? 'http://localhost:5188',
-  plugins: [usernameClient(), adminClient(), userInfoPluginClient(), jwtClient()]
+  plugins: [usernameClient(), adminClient(), userInfoPluginClient()]
 });
 
 export const { useSession, signIn, signOut, signUp } = authClient;

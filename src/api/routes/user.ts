@@ -7,31 +7,27 @@ import Type from 'typebox';
 const router = new Hono()
   .use(protectedAdminRoute)
   // all routes are protected admin routes
-  .get(
-    '/list_users',
-    tbValidator('query', Type.Object({ user_id: Type.String() })),
-    async (c) => {
-      const { user_id } = c.req.valid('query');
+  .get('/list_users', tbValidator('query', Type.Object({ user_id: Type.String() })), async (c) => {
+    const { user_id } = c.req.valid('query');
 
-      const users = await db.query.user.findMany({
-        columns: {
-          id: true,
-          name: true,
-          email: true,
-          role: true
-        },
-        where: ({ id }, { ne }) => ne(id, user_id),
-        with: {
-          app_scopes: {
-            columns: {
-              scope: true
-            }
+    const users = await db.query.user.findMany({
+      columns: {
+        id: true,
+        name: true,
+        email: true,
+        role: true
+      },
+      where: ({ id }, { ne }) => ne(id, user_id),
+      with: {
+        app_scopes: {
+          columns: {
+            scope: true
           }
         }
-      });
-      return c.json(users);
-    }
-  );
+      }
+    });
+    return c.json(users);
+  });
 
 export const user_router = router;
 
