@@ -1,12 +1,12 @@
 import { relations } from 'drizzle-orm';
 import { account, user } from './auth-schema';
 import { pgTable, text, pgEnum, primaryKey } from 'drizzle-orm/pg-core';
-import z from 'zod';
+import Type from 'typebox';
 
 export * from './auth-schema';
 
 const APP_SCOPES = ['projects_portal', 'padavali', 'lekha'] as const;
-export const AppScopeEnum = z.enum(APP_SCOPES);
+export const AppScopeEnum = Type.Enum(APP_SCOPES);
 export type app_scope_type = (typeof APP_SCOPES)[number];
 export const app_scope_enum_db = pgEnum('app_scope', APP_SCOPES);
 
