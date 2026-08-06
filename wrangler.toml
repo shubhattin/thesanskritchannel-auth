@@ -12,6 +12,11 @@ preview_urls = false
 # Still: do NOT put real values in [vars] — those keys would overwrite dashboard values.
 keep_vars = true
 
+# Region placement (matches dashboard / Neon + Upstash in Singapore).
+# Runs the Worker in the Cloudflare data center with lowest latency to that region.
+[placement]
+region = "aws:ap-southeast-1"
+
 [assets]
 binding = "ASSETS"
 directory = ".svelte-kit/cloudflare"
