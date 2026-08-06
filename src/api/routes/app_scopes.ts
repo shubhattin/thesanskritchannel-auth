@@ -1,12 +1,12 @@
 import { db } from '~/db/db';
 import { user_app_scope_join, AppScopeEnum } from '~/db/schema';
-import { z } from 'zod';
 import { and, eq } from 'drizzle-orm';
 import { redis } from '~/db/redis';
 import { REDIS_CACHE_KEYS } from '~/db/redis';
 import { Hono } from 'hono';
 import { protectedAdminRoute } from '../context';
-import { zValidator } from '@hono/zod-validator';
+import { tbValidator } from '@hono/typebox-validator';
+import Type from 'typebox';
 import ms from 'ms';
 import { waitUntil } from '@vercel/functions';
 
@@ -16,7 +16,7 @@ const router = new Hono()
   .get(
     '/get_user_app_scope_list',
     // public
-    zValidator('query', z.object({ user_id: z.string() })),
+    tbValidator('query', Type.Object({ user_id: Type.String() })),
     async (c) => {
       const user = c.get('user')!;
       const { user_id } = c.req.valid('query');
@@ -32,7 +32,10 @@ const router = new Hono()
   .get(
     '/get_user_app_scope_status',
     //  public route
-    zValidator('query', z.object({ scope_name: AppScopeEnum, user_id: z.string() })),
+    tbValidator(
+      'query',
+      Type.Object({ scope_name: AppScopeEnum, user_id: Type.String() })
+    ),
     async (c) => {
       const { scope_name, user_id } = c.req.valid('query');
       const cache = await redis.get<boolean>(REDIS_CACHE_KEYS.user_app_scope(user_id, scope_name));
@@ -54,7 +57,7 @@ const router = new Hono()
   .post(
     '/add_user_app_scope',
     protectedAdminRoute,
-    zValidator('json', z.object({ scope: AppScopeEnum, user_id: z.string() })),
+    tbValidator('json', Type.Object({ scope: AppScopeEnum, user_id: Type.String() })),
     async (c) => {
       const { scope, user_id } = c.req.valid('json');
       await db.insert(user_app_scope_join).values({ user_id, scope });
@@ -70,7 +73,7 @@ const router = new Hono()
   .post(
     '/remove_user_app_scope',
     protectedAdminRoute,
-    zValidator('json', z.object({ scope: AppScopeEnum, user_id: z.string() })),
+    tbValidator('json', Type.Object({ scope: AppScopeEnum, user_id: Type.String() })),
     async (c) => {
       const { scope, user_id } = c.req.valid('json');
       await Promise.all([

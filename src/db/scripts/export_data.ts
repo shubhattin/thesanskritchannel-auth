@@ -3,14 +3,14 @@ import { readFile } from 'fs/promises';
 import { dbMode, take_input } from '~/tools/kry.server';
 import { user, account, verification, jwks, user_app_scope_join } from '~/db/schema';
 import {
-  UserSchemaZod,
-  AccountSchemaZod,
-  VerificationSchemaZod,
-  JwksSchemaZod,
-  UserAppScopeJoinSchemaZod
-} from '~/db/schema_zod';
-import { sql } from 'drizzle-orm';
-import { z } from 'zod';
+  UserSchema,
+  AccountSchema,
+  VerificationSchema,
+  JwksSchema,
+  UserAppScopeJoinSchema
+} from '~/db/schema_typebox';
+import Type from 'typebox';
+import { Value } from 'typebox/value';
 import chalk from 'chalk';
 
 const main = async () => {
@@ -29,15 +29,16 @@ const main = async () => {
     LOCAL: 'db_data.json'
   }[dbMode];
 
-  const data = z
-    .object({
-      user: UserSchemaZod.array(),
-      account: AccountSchemaZod.array(),
-      verification: VerificationSchemaZod.array(),
-      user_app_scope_join: UserAppScopeJoinSchemaZod.array(),
-      jwks: JwksSchemaZod.array()
-    })
-    .parse(JSON.parse((await readFile(`./out/${in_file_name}`)).toString()));
+  const data = Value.Decode(
+    Type.Object({
+      user: Type.Array(UserSchema),
+      account: Type.Array(AccountSchema),
+      verification: Type.Array(VerificationSchema),
+      user_app_scope_join: Type.Array(UserAppScopeJoinSchema),
+      jwks: Type.Array(JwksSchema)
+    }),
+    JSON.parse((await readFile(`./out/${in_file_name}`)).toString())
+  );
 
   dbClient_ext.transaction(async (tx) => {
     // deleting all the tables initially

@@ -1,4 +1,5 @@
-import { z } from 'zod';
+import Type from 'typebox';
+import { Value } from 'typebox/value';
 
 export const get_db_url = (env: any): string => {
   let url: string = null!;
@@ -7,7 +8,7 @@ export const get_db_url = (env: any): string => {
     else if (process.env.DB_MODE === 'PREVIEW') url = env.PG_DATABASE_URL2;
     else url = env.PG_DATABASE_URL;
   } else url = env.PG_DATABASE_URL;
-  const url_parse = z.string().describe('Connection string for PostgreSQL').safeParse(url);
-  if (!url_parse.success) throw new Error('Please set `PG_DATABASE_URL`');
-  return url_parse.data;
+  const schema = Type.String({ description: 'Connection string for PostgreSQL' });
+  if (!Value.Check(schema, url)) throw new Error('Please set `PG_DATABASE_URL`');
+  return url;
 };

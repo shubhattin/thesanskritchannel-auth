@@ -1,13 +1,14 @@
-import { zValidator } from '@hono/zod-validator';
+import { tbValidator } from '@hono/typebox-validator';
 import { PUBLIC_BETTER_AUTH_URL } from '$env/static/public';
 import { Hono } from 'hono';
 import { createLocalJWKSet, decodeProtectedHeader, jwtVerify, type JSONWebKeySet } from 'jose';
 import ky from 'ky';
 import { REDIS_CACHE_KEYS, redis } from '~/db/redis';
-import { z } from 'zod';
+import Type from 'typebox';
+import { Value } from 'typebox/value';
 
-const jwksResponseSchema = z.object({
-  keys: z.array(z.looseObject({}))
+const jwksResponseSchema = Type.Object({
+  keys: Type.Array(Type.Record(Type.String(), Type.Unknown()))
 });
 
 function getJwksCacheKey() {
@@ -16,7 +17,8 @@ function getJwksCacheKey() {
 
 async function fetchAndCacheJwks(): Promise<JSONWebKeySet> {
   const cacheKey = getJwksCacheKey();
-  const fetchedJwks = jwksResponseSchema.parse(
+  const fetchedJwks = Value.Parse(
+    jwksResponseSchema,
     await ky
       .get(new URL('/api/auth/jwks', PUBLIC_BETTER_AUTH_URL), {
         timeout: 5000
@@ -35,7 +37,7 @@ async function getCachedJwks(): Promise<JSONWebKeySet | null> {
   const cacheKey = getJwksCacheKey();
   const cachedJwks = await redis.get<JSONWebKeySet>(cacheKey);
   if (cachedJwks) {
-    return jwksResponseSchema.parse(cachedJwks) as JSONWebKeySet;
+    return Value.Parse(jwksResponseSchema, cachedJwks) as JSONWebKeySet;
   }
 
   return null;
@@ -72,7 +74,7 @@ async function getJwksForToken(token: string) {
 
 const router = new Hono().get(
   '/verify',
-  zValidator('query', z.object({ token: z.string() })),
+  tbValidator('query', Type.Object({ token: Type.String() })),
   async (c) => {
     const { token } = c.req.valid('query');
 

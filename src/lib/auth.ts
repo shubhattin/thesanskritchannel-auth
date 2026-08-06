@@ -7,8 +7,12 @@ import { env } from '$env/dynamic/private';
 import { admin, openAPI, username, jwt } from 'better-auth/plugins';
 import { COOKIE_CACHE_TIME_MS } from './cache-time';
 import { userInfoPlugin } from './auth_plugins/user_info/server';
-import { z } from 'zod';
+import Type from 'typebox';
+import Format from 'typebox/format';
+import { Value } from 'typebox/value';
 import { PUBLIC_BETTER_AUTH_URL } from '$env/static/public';
+
+Format.Set('url', Format.IsUrl);
 
 const JWKS_ROTATION_INTERVAL_S = 60 * 60 * 24 * 30; // 30 days
 const JWKS_GRACE_PERIOD_S = 60 * 60 * 24 * 30; // 30 days
@@ -17,8 +21,9 @@ export const ALLOWED_ORIGINS = (() => {
   if (import.meta.env.DEV) return ['http://localhost:*'];
   const list: string[] = [];
   if (env.AUTH_DOMAIN) list.push(`https://*.${env.AUTH_DOMAIN}`);
-  const other_allowed_origins = z.url().array().safeParse(env.OTHER_ALLOWED_ORIGINS?.split(','));
-  if (other_allowed_origins.success) list.push(...other_allowed_origins.data);
+  const origins = env.OTHER_ALLOWED_ORIGINS?.split(',');
+  const urlArraySchema = Type.Array(Type.String({ format: 'url' }));
+  if (origins && Value.Check(urlArraySchema, origins)) list.push(...origins);
   return list;
 })();
 
