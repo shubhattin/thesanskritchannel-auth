@@ -5,9 +5,39 @@ compatibility_flags = ["nodejs_compat"]
 workers_dev = false
 preview_urls = false
 
+# Preserve dashboard plaintext Variables & Secrets across deploys.
+# Without this, `wrangler deploy` treats this file as source of truth and can wipe
+# dashboard plaintext vars that are not listed under [vars].
+# Secrets are never deleted by deploy either way; keep_vars mainly protects plaintext vars.
+# Still: do NOT put real values in [vars] — those keys would overwrite dashboard values.
+keep_vars = true
+
 [assets]
 binding = "ASSETS"
 directory = ".svelte-kit/cloudflare"
+
+# Runtime env vars live in the Cloudflare dashboard only (Settings → Variables and Secrets).
+# Do NOT put [vars] here — even with keep_vars, keys present in [vars] overwrite dashboard.
+# See .env.example for the expected variable names.
+#
+# Build-time vs runtime (NOT like Vercel — two separate systems):
+#   - Runtime: Settings → Variables and Secrets
+#       Also: [vars] / secrets in this file (deployed with the Worker).
+#       Available to the running Worker only. keep_vars protects dashboard plaintext vars.
+#   - Build:   Settings → Build → Build variables and secrets
+#       Injected only into the Workers Builds CI process (during `bun run build`).
+#       NOT readable from this toml. There is no wrangler.toml field for CI build vars today.
+#       Dashboard Build vars are the source of truth for build-time; they are not
+#       overwritten by git deploys or by [vars] in this file (different store).
+#   - [vars] here does NOT make values available during CI build.
+#   - Prefer inlining stable build flags in the Build command when possible, e.g.
+#       BUILD_MODE=cloudflare bun run build
+#
+# Workers Builds (configure in the Cloudflare dashboard, not here):
+#   Build command:  bun install --frozen-lockfile && BUILD_MODE=cloudflare bun run build
+#   Deploy command: bunx wrangler deploy --keep-vars
+#   Non-prod:       bunx wrangler versions upload --keep-vars
+#   Root directory: /
 
 [observability]
 enabled = false
