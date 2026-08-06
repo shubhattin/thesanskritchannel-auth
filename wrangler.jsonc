@@ -1,0 +1,14 @@
+{
+	// Runtime vars come from the Cloudflare dashboard (deploy with --keep-vars).
+	// Do not put secrets/vars here — local `.env` is also ignored for Cloudflare builds.
+	"name": "tsc-users",
+	"main": ".svelte-kit/cloudflare/_worker.js",
+	"compatibility_date": "2026-07-21",
+	"compatibility_flags": ["nodejs_compat"],
+	"workers_dev": false,
+	"preview_urls": false,
+	"assets": {
+		"binding": "ASSETS",
+		"directory": ".svelte-kit/cloudflare"
+	}
+}
