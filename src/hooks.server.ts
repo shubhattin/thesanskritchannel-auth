@@ -3,13 +3,8 @@ import { auth, ALLOWED_ORIGINS } from '$lib/auth'; // path to your auth file
 import { svelteKitHandler } from 'better-auth/svelte-kit';
 import { building } from '$app/environment';
 import { env } from '$env/dynamic/private';
-import { api_handler } from '~/api/api_router';
 
 export const AUTH_DOMAIN_REGEX = new RegExp(`^https:\/\/.*\.${env.AUTH_DOMAIN}$`);
-
-function isHonoApiPath(pathname: string) {
-  return pathname.startsWith('/api/') && !pathname.startsWith('/api/auth');
-}
 
 export const handle: Handle = async ({ event, resolve }) => {
   const origin = event.request.headers.get('origin');
@@ -32,17 +27,12 @@ export const handle: Handle = async ({ event, resolve }) => {
       }
     });
   }
-
-  // Hono API (exclude Better Auth `/api/auth/*`, handled below)
-  const res: Response = isHonoApiPath(event.url.pathname)
-    ? await api_handler.fetch(event.request)
-    : await svelteKitHandler({
-        event,
-        resolve,
-        auth,
-        building
-      });
-
+  const res: Response = await svelteKitHandler({
+    event,
+    resolve,
+    auth,
+    building
+  });
   if (IS_CORS_ALLOWED_URL && isAllowedOrigin) {
     res.headers.append('Access-Control-Allow-Origin', origin);
     res.headers.append('Access-Control-Allow-Credentials', 'true');
